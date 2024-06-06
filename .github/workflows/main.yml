@@ -2,47 +2,77 @@ name: Deploy to ECR
 
 on:
   push:
-    branches:
-      - main
+    branches: [main]
 
 jobs:
-  deploy:
+  build:
+    name: Build and Deploy Images
     runs-on: ubuntu-latest
 
-    env:
-      ECR_REPOSITORY_NAME_APP: assignment-1-app
-      ECR_REPOSITORY_NAME_DB: assignment-1-db
-      AWS_REGION: us-east-1
-
     steps:
-      - name: Checkout repository
+      - name: Check out code
         uses: actions/checkout@v2
 
-      - name: Clear AWS environment variables
-        run: |
-          unset AWS_ACCESS_KEY_ID
-          unset AWS_SECRET_ACCESS_KEY
-          unset AWS_SESSION_TOKEN
-
-      - name: Configure AWS credentials
-        uses: aws-actions/configure-aws-credentials@v2
-        with:
-          aws-access-key-id: ${{ secrets.AWS_ACCESS_KEY_ID }}
-          aws-secret-access-key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
-          aws-region: ${{ env.AWS_REGION }}
-
-      - name: Log in to Amazon ECR
+      - name: Login to Amazon ECR
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
+        with:
+          http-proxy: http://607026328084.dkr.ecr.us-east-1.amazonaws.com
+          mask-password: false
+          registry-type: private
+          skip-logout: true
+          registries: |
+            assignment-1-app
+            assignment-1-db
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_SESSION_TOKEN: ${{ secrets.AWS_SESSION_TOKEN }}
+          AWS_REGION: us-east-1
 
-      - name: Build, tag, and push the app Docker image
-        run: |
-          APP_IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_NAME_APP }}"
-          docker build -t $APP_IMAGE_URI:latest -f Dockerfile .
-          docker push $APP_IMAGE_URI:latest
+      - name: Create Docker network
+        run: docker network create mynetwork1
 
-      - name: Build, tag, and push the MySQL Docker image
+      - name: Build, tag, and push database image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: assignment-1-db
+          IMAGE_TAG: v1.1
         run: |
-          DB_IMAGE_URI="${{ secrets.AWS_ACCOUNT_ID }}.dkr.ecr.${{ env.AWS_REGION }}.amazonaws.com/${{ env.ECR_REPOSITORY_NAME_DB }}"
-          docker build -t $DB_IMAGE_URI:latest -f Dockerfile_mysql .
-          docker push $DB_IMAGE_URI:latest
+          # Build Docker image for database
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile_mysql .
+          # Push Docker image to ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Build, tag, and push app image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: assignment-1-app
+          IMAGE_TAG: v1.1
+        run: |
+          # Build Docker image for app
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+          # Push Docker image to ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Build, tag, and push database image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: assignment-1-db
+          IMAGE_TAG: v1.1
+        run: |
+          # Build Docker image for database
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile_mysql .
+          # Push Docker image to ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
+
+      - name: Build, tag, and push app image to Amazon ECR
+        env:
+          ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
+          ECR_REPOSITORY: assignment-1-app
+          IMAGE_TAG: v1.1
+        run: |
+          # Build Docker image for app
+          docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
+          # Push Docker image to ECR
+          docker push $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG
