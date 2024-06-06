@@ -5,7 +5,6 @@ import random
 import argparse
 from urllib.parse import quote as url_quote
 
-
 app = Flask(__name__)
 
 DBHOST = os.environ.get("DBHOST") or "localhost"
