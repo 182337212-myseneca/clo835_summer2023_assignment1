@@ -18,6 +18,12 @@ jobs:
       - name: Checkout repository
         uses: actions/checkout@v2
 
+      - name: Clear AWS environment variables
+        run: |
+          unset AWS_ACCESS_KEY_ID
+          unset AWS_SECRET_ACCESS_KEY
+          unset AWS_SESSION_TOKEN
+
       - name: Configure AWS credentials
         uses: aws-actions/configure-aws-credentials@v2
         with:
