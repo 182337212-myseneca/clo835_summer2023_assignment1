@@ -17,10 +17,13 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          registry: 607026328084.dkr.ecr.us-east-1.amazonaws.com
+          http-proxy: 607026328084.dkr.ecr.us-east-1.amazonaws.com
           mask-password: false
           registry-type: private
           skip-logout: false
+          registries: |
+            assignment-1-app
+            assignment-1-db
         env:
           AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
           AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
