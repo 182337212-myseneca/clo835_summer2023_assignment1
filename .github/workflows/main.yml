@@ -17,7 +17,7 @@ jobs:
         id: login-ecr
         uses: aws-actions/amazon-ecr-login@v1
         with:
-          http-proxy: 607026328084.dkr.ecr.us-east-1.amazonaws.com
+          http-proxy: http://607026328084.dkr.ecr.us-east-1.amazonaws.com
           mask-password: false
           registry-type: private
           skip-logout: true
