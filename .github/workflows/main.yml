@@ -33,7 +33,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: assignment-1-db
-          IMAGE_TAG: v1.1
+          IMAGE_TAG: v2.1
         run: |
           # Build Docker image for database
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile_mysql .
@@ -44,7 +44,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: assignment-1-app
-          IMAGE_TAG: v1.1
+          IMAGE_TAG: v2.1
         run: |
           # Build Docker image for app
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
@@ -55,7 +55,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: assignment-1-db
-          IMAGE_TAG: v1.1
+          IMAGE_TAG: v2.1
         run: |
           # Build Docker image for database
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile_mysql .
@@ -66,7 +66,7 @@ jobs:
         env:
           ECR_REGISTRY: ${{ steps.login-ecr.outputs.registry }}
           ECR_REPOSITORY: assignment-1-app
-          IMAGE_TAG: v1.1
+          IMAGE_TAG: v2.1
         run: |
           # Build Docker image for app
           docker build -t $ECR_REGISTRY/$ECR_REPOSITORY:$IMAGE_TAG -f Dockerfile .
